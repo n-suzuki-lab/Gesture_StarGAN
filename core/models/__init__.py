@@ -1,3 +1,3 @@
-from .EqualledCycleGAN import *
+from .StarGAN import *
 
-__all__ = ['EqualledCycleGAN_Generator', 'EqualledCycleGAN_Generator2', 'EqualledCycleGAN_ArgumentedDiscriminator', 'EqualledCycleGAN_ArgumentedPatchDiscriminator']
+__all__ = ['StarGAN_Generator', 'StarGAN_Discriminator']

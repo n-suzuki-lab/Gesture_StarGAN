@@ -12,9 +12,8 @@ from chainer.training import extensions
 
 from core import models
 from core.utils.config import Config
-#from core.utils.tensorboardreport import TensorBoardReport
-from core.updater.EqualledArgumentedCycleGANupdater import EqualledArgumentedCycleGANUpdater
-from core.datasets.dataset import MultiDataset_jp_GAN
+from core.updater.StarGANupdater import StarGANUpdater
+from core.datasets.dataset import GestureDataset
 
 
 def parse_args():
@@ -40,10 +39,18 @@ def train():
     print('# iteration: {}'.format(iteration))
     print('')
 
-    ## Set up a neural network to train
-    ## "n_class" is number of styles (i.e. Old, Normal, ...)
-    gen = getattr(models, cfg.train.generator.model)(cfg.train.generator, n_class=4) 
-    dis = getattr(models, cfg.train.discriminator.model)(cfg.train.discriminator, n_user=len(cfg.train.dataset_dirs))
+    ## Set up networks to train
+    # number of gesture classes and users
+    n_gesture = 4 
+    n_user = len(cfg.train.dataset_dirs)
+    if cfg.style == 'gesture':
+        gen = getattr(models, cfg.train.generator.model)(cfg.train.generator, n_style=n_gesture) 
+    elif cfg.style == 'user':
+        gen = getattr(models, cfg.train.generator.model)(cfg.train.generator, n_style=n_user)
+    else:
+        print(f'Invalid style: {cfg.style}')
+        exit()
+    dis = getattr(models, cfg.train.discriminator.model)(cfg.train.discriminator, n_gesture=n_gesture, n_user=n_user)
  
     ## Load resume checkpoint to restart. Load optimizer state later.
     if args.resume or cfg.resume:
@@ -86,37 +93,19 @@ def train():
         gen.to_gpu()
         dis.to_gpu()
 
-    ## Load data minmax
-    ## Since we apply min-max normalization to each sample, store the minimum and maximum values of datasets in advance (to 'minmax_path', which are used in every training.
-    # minmax_path = cfg.minmax
-    # if os.path.exists(minmax_path):
-    #     with np.load(minmax_path) as data:
-    #         datamin = data['min']
-    #         datamax = data['max']
-    # else:
-    #     print(f'{minmax_path} not found.')
-    #     sys.exit()
-
     ## Set up dataset
-    ## * Argument
-    ##     - dataset_dirs : List of root directory which contains each style motion datasets.
-    ##     - frame_nums : Number of frames in one motion sample.
-    ##     - frame_step : Interval length of frames extracted from original motion (120fps).
-    ##     - equal : Whether to use 'equall loss' in train. If it's true, data loader creates batch including some pairs of same class motions.
-    data_paths = list(map((lambda str: Path(__file__).parent / '..' / str),cfg.train.dataset_dirs))
-    train = MultiDataset_jp_GAN(data_paths, equal=cfg.train.class_equal)
+    data_paths = list(map((lambda str: Path(__file__).parent / '..' / str), cfg.train.dataset_dirs))
+    train = GestureDataset(data_paths, style=cfg.style, equal=cfg.train.class_equal)
     for i in range(len(cfg.train.dataset_dirs)):
         print(f'{cfg.train.dataset_dirs[i]} contains {train.len_each()[i]} samples')
 
     train_iter = chainer.iterators.SerialIterator(train, batchsize)
 
     ## Set up a Trainer
-    updater = EqualledArgumentedCycleGANUpdater(
+    updater = StarGANUpdater(
         models = (gen, dis),
         iterator = train_iter,
         optimizer = {'gen': opt_gen, 'dis': opt_dis},
-        # datamin = datamin,
-        # datamax = datamax,
         cfg = cfg,
         out=out)
     trainer = training.Trainer(updater, (iteration, 'iteration'), out=out)
@@ -133,9 +122,8 @@ def train():
     trainer.extend(extensions.snapshot_object(opt_gen, 'opt_gen_iter_{.updater.iteration}.npz'), trigger=save_interval )
     trainer.extend(extensions.snapshot_object(opt_dis, 'opt_dis_iter_{.updater.iteration}.npz'), trigger=save_interval )
     trainer.extend(extensions.LogReport(trigger=display_interval))
-    # trainer.extend(TensorBoardReport(out), trigger=snapshot_interval)
     trainer.extend(extensions.PrintReport([
-            'epoch', 'iteration', 'lr', 'gen/loss_adv', 'gen/loss_eq', 'gen/loss_ges', 'gen/loss_user', 'gen/loss_rec', 'gen/loss_sm', 'dis/loss_adv', 'dis/loss_ges', 'dis/loss_user' 
+            'epoch', 'iteration', 'lr', 'gen/loss_adv', 'gen/loss_eq', 'gen/loss_style', 'gen/loss_cont', 'gen/loss_rec', 'gen/loss_sm', 'dis/loss_adv', 'dis/loss_style', 'dis/loss_cont' 
         ]), trigger=display_interval)
     trainer.extend(extensions.ProgressBar(update_interval=display_interval[0]))
 
@@ -143,8 +131,8 @@ def train():
     if not os.path.exists(out):
         os.makedirs(out)
     shutil.copy(args.config, f'./{out}')
-    shutil.copy('./core/models/EqualledCycleGAN.py', f'./{out}')
-    shutil.copy('./core/updater/EqualledArgumentedCycleGANupdater.py', f'./{out}')
+    shutil.copy('./core/models/StarGAN.py', f'./{out}')
+    shutil.copy('./core/updater/StarGANupdater.py', f'./{out}')
 
     commands = sys.argv
     with open(f'./{out}/command.txt', 'w') as f:

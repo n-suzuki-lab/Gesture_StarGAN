@@ -3,12 +3,13 @@
 resume = ''
 weight = ''
 
-trial = 3
+style = 'user' # or 'user'
+trial = 1
 
 # Trainig strategy
 train = dict(
     batchsize = 20,
-    iterations = 80000,
+    iterations = 2000,
     class_equal = False,
     dataset_dirs = ['data/data/user01/first',
                     'data/data/user02/first',
@@ -17,15 +18,15 @@ train = dict(
                     'data/data/user08/first',
                     'data/data/user09/first'
                     ],
-    out = f'results/gesture/trial{trial}',
+    out = f'results/{style}/trial{trial}',
     generator = dict(
-        model = 'EqualledCycleGAN_Generator7',
+        model = 'StarGAN_Generator',
         norm = 'batch',
         top = 100,
         use_sigmoid = True,
         ),
     discriminator = dict(
-        model = 'EqualledCycleGAN_ArgumentedDiscriminator3',
+        model = 'StarGAN_Discriminator',
         dropout = False,
         norm = 'batch',
         top = 100,
@@ -44,10 +45,10 @@ train = dict(
         lam_d_ad = 1,
         lam_g_eq = 100.,
         lam_g_rec = 100.,
-        lam_g_ges = 10.,
-        lam_d_ges = 10., 
-        lam_g_user = 1.,
-        lam_d_user = 1., 
+        lam_g_style = 10.,
+        lam_d_style = 10., 
+        lam_g_cont = 1.,
+        lam_d_cont = 1., 
         lam_g_sm = 1.,
         # lam_d_gp = 0.1,
         # lam_d_drift = 0.1,
