@@ -9,7 +9,7 @@ trial = 1
 # Trainig strategy
 train = dict(
     batchsize = 20,
-    iterations = 2000,
+    iterations = 80000,
     class_equal = False,
     dataset_dirs = ['data/data/user01/first',
                     'data/data/user02/first',

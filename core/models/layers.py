@@ -15,7 +15,6 @@ import chainer.links as L
 from chainer import Variable
 
 from .function import max_singular_value
-#from core.models.instance_normalization import InstanceNormalization
 from core.models.links import CategoricalConditionalBatchNormalization, InstanceNormalization, ConditionalInstanceNormalization
 
 class conv_Layer(chainer.Chain):
