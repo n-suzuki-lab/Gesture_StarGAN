@@ -3,21 +3,26 @@
 resume = ''
 weight = ''
 
-style = 'user' # or 'user'
+style = 'user' # 'gesture' or 'user'
 trial = 1
 
 # Trainig strategy
 train = dict(
     batchsize = 20,
-    iterations = 80000,
+    iterations = 50,
     class_equal = False,
-    dataset_dirs = ['data/data/user01/first',
-                    'data/data/user02/first',
-                    'data/data/user03/first',
-                    'data/data/user04/first',
-                    'data/data/user08/first',
-                    'data/data/user09/first'
+    dataset_dirs = ['data/user01/first',
+                    'data/user02/first',
+                    'data/user03/first',
+                    'data/user04/first',
+                    'data/user08/first',
+                    'data/user09/first'
                     ],
+    n_gesture = 4,
+    # skip_ges is not loaded for train
+    #    style: gesture -> None
+    #    style: user -> gesture_id not included in training data
+    skip_ges = None, 
     out = f'results/{style}/trial{trial}',
     generator = dict(
         model = 'StarGAN_Generator',
@@ -31,7 +36,6 @@ train = dict(
         norm = 'batch',
         top = 100,
         ),
-    snapshot_interval = 1000,
     display_interval = 24,
     preview_interval = 500,
     save_interval = 1000,
@@ -57,12 +61,15 @@ train = dict(
         ),
     )
 
-iter = 80000
-user = 9
-
 # Testing strategy
+gen_model_iter = 80000
+source_user = 0
+
 test = dict(
-    gen = f'results/gesture/trial{trial}/gen_iter_{iter}.npz',
-    dataset = f'data/data/user{user+1:02}/first',
-    out = f'results/gesture/trial{trial}/iter{iter}/user{user}',
+    # gen_path = f'results/{style}/trial{trial}/gen_iter_{gen_model_iter}.npz',
+    gen_path = f'results/{style}/trial{trial}/gen.npz',
+    source_data = f'data/user{source_user+1:02}/first',
+    ges_class = 0,
+    target_style = 1,
+    out = f'results/{style}/trial{trial}/generated_data/iter{gen_model_iter}',
     )

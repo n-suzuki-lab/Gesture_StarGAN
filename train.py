@@ -17,7 +17,7 @@ from core.datasets.dataset import GestureDataset
 
 
 def parse_args():
-    parser = argparse.ArgumentParser(description='PRGAN')
+    parser = argparse.ArgumentParser(description='StarGAN')
     parser.add_argument('config', help='config file path')
     parser.add_argument('--gpu', '-g', type=int, default=0,
                         help='GPU ID (negative value indicates CPU)')
@@ -41,7 +41,7 @@ def train():
 
     ## Set up networks to train
     # number of gesture classes and users
-    n_gesture = 4 
+    n_gesture = cfg.train.n_gesture
     n_user = len(cfg.train.dataset_dirs)
     if cfg.style == 'gesture':
         gen = getattr(models, cfg.train.generator.model)(cfg.train.generator, n_style=n_gesture) 
@@ -94,8 +94,7 @@ def train():
         dis.to_gpu()
 
     ## Set up dataset
-    data_paths = list(map((lambda str: Path(__file__).parent / '..' / str), cfg.train.dataset_dirs))
-    train = GestureDataset(data_paths, style=cfg.style, equal=cfg.train.class_equal)
+    train = GestureDataset(cfg.train.dataset_dirs, style=cfg.style, equal=cfg.train.class_equal)
     for i in range(len(cfg.train.dataset_dirs)):
         print(f'{cfg.train.dataset_dirs[i]} contains {train.len_each()[i]} samples')
 
@@ -111,10 +110,8 @@ def train():
     trainer = training.Trainer(updater, (iteration, 'iteration'), out=out)
 
     ## Set invervals
-    ##     - snapshot_interval : Interval iterations of writing tensorboard log.
     ##     - display_interval : Interval iterations of print logs on display.
     ##     - save_interval : Interval iterations of save models and preview images.
-    snapshot_interval = (cfg.train.snapshot_interval, 'iteration')
     display_interval = (cfg.train.display_interval, 'iteration')
     save_interval = (cfg.train.save_interval, 'iteration')
     trainer.extend(extensions.snapshot_object(gen, 'gen_iter_{.updater.iteration}.npz'), trigger=save_interval )
