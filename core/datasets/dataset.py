@@ -11,12 +11,12 @@ from chainer import datasets
 # return data (dict{user_id:data}) and data length (dict{user_id:length})
 # please edit to fit your data.
 def data_load(path, n_gesture=4, datamin=0, datamax=1):
-    gestures = {}
-    length = {}
+    gestures = []
+    length = []
     for i in range(n_gesture):
         gesture = np.load(f'{path}/gesture{i+1}.npy')
-        gestures[i] = (gesture-datamin)/(datamax-datamin) # normalization
-        length[i] = gesture.shape[0]
+        gestures.append((gesture-datamin)/(datamax-datamin)) # normalization
+        length.append(gesture.shape[0])
 
     return gestures, length
 
@@ -43,7 +43,7 @@ class GestureDataset(chainer.dataset.DatasetMixin):
             self.datalen_list.append(data_len)
 
     def __len__(self):
-        return sum(map((lambda dic: sum(list(dic.values()))), self.datalen_list))
+        return sum(map((lambda l: sum(l)), self.datalen_list))
 
     def len_each(self):
         return self.datalen_list

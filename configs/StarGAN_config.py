@@ -1,9 +1,9 @@
-# EqualledArgumentedCycleGAN_Styled_lotated
+# config for StarGAN
 
 resume = ''
 weight = ''
 
-style = 'user' # 'gesture' or 'user'
+style = 'gesture' # 'gesture' or 'user'
 trial = 1
 
 # Trainig strategy
@@ -19,10 +19,6 @@ train = dict(
                     'data/user09/first'
                     ],
     n_gesture = 4,
-    # skip_ges is not loaded for train
-    #    style: gesture -> None
-    #    style: user -> gesture_id not included in training data
-    skip_ges = None, 
     out = f'results/{style}/trial{trial}',
     generator = dict(
         model = 'StarGAN_Generator',
@@ -66,8 +62,7 @@ gen_model_iter = 80000
 source_user = 0
 
 test = dict(
-    # gen_path = f'results/{style}/trial{trial}/gen_iter_{gen_model_iter}.npz',
-    gen_path = f'results/{style}/trial{trial}/gen.npz',
+    gen_path = f'results/{style}/trial{trial}/gen_iter_{gen_model_iter}.npz',
     source_data = f'data/user{source_user+1:02}/first',
     ges_class = 0,
     target_style = 1,
