@@ -8,7 +8,7 @@ from chainer import datasets
 
 
 ## Data loader
-# return data (dict{user_id:data}) and data length (dict{user_id:length})
+# return data and data length
 # please edit to fit your data.
 def data_load(path, n_gesture=4, datamin=0, datamax=1):
     gestures = []

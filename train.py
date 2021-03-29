@@ -111,7 +111,7 @@ def train():
 
     ## Set invervals
     ##     - display_interval : Interval iterations of print logs on display.
-    ##     - save_interval : Interval iterations of save models and preview images.
+    ##     - save_interval : Interval iterations of save models.
     display_interval = (cfg.train.display_interval, 'iteration')
     save_interval = (cfg.train.save_interval, 'iteration')
     trainer.extend(extensions.snapshot_object(gen, 'gen_iter_{.updater.iteration}.npz'), trigger=save_interval )
