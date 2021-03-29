@@ -24,6 +24,7 @@ Typical properties are described below.
 |ges_class|The gesture class of source data.|
 |target_style|Target style ID (If the style is gesture, use the gesture ID; if it is user, use the user ID.)|
 ## Train
+Before training, please edit core/dataset/dataset.py to fit your data.
 To train the networks:
 ```
 python train.py {PARH_TO_CONFIG_FILE}
@@ -34,7 +35,8 @@ python train.py configs/StarGAN_config.py
 ```
 
 ## Test
-To transfer data with the trained network:
+Before testing, please edit ``data_load`` method in test.py to fit your data.
+To transform data with the trained network:
 ```
 python test.py {PARH_TO_CONFIG_FILE}
 ```
