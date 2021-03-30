@@ -6,7 +6,9 @@
 - numpy
 ## Config
 Basically, all training settings are handled in the config file.
+
 The config file has a dictionary hierarchy and is parsed according to core/utils/config.py.
+
 Typical properties are described below.
 ### train strategy
 |Property|Description|
@@ -25,6 +27,7 @@ Typical properties are described below.
 |target_style|Target style ID (If the style is gesture, use the gesture ID; if it is user, use the user ID.)|
 ## Train
 Before training, please edit core/dataset/dataset.py to fit your data.
+
 To train the networks:
 ```
 python train.py {PARH_TO_CONFIG_FILE}
@@ -36,6 +39,7 @@ python train.py configs/StarGAN_config.py
 
 ## Test
 Before testing, please edit ``data_load`` method in test.py to fit your data.
+
 To transform data with the trained network:
 ```
 python test.py {PARH_TO_CONFIG_FILE}
