@@ -5,7 +5,7 @@
 - cupy
 - numpy
 ## Config
-Basically, all training settings are handled in the onfig file.
+Basically, all training settings are handled in the config file.
 The config file has a dictionary hierarchy and is parsed according to core/utils/config.py.
 Typical properties are described below.
 ### train strategy
